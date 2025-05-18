@@ -30,6 +30,8 @@ void save_to_file(char* filename, struct Line** lines, int num_of_lines);
 
 void load_from_file(char* filename, struct Line** lines, int num_of_lines);
 
+void end_program(struct Line** lines, int num_of_lines);
+
 struct Line {
     char *first_symbol;
     int capacity;

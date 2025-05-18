@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "header.h"
@@ -26,7 +25,6 @@ int main(void) {
 
         switch (command_num) {
             case 1:
-                // insert_text_on_index(line_ptrs_filled-1, lines[line_ptrs_filled-1]->filled, lines, stdin);
                 append_to_the_end(lines,  line_ptrs_filled);
                 break;
             case 2:
@@ -37,7 +35,6 @@ int main(void) {
                 add_a_new_line(lines, line_ptrs_filled);
                 line_ptrs_filled += 1;
                 printf("New line started \n");
-                // insert_text_on_index(line_ptrs_filled-1, lines[line_ptrs_filled-1]->filled, lines, stdin);
                 append_to_the_end(lines,  line_ptrs_filled);
                 break;
             case 3:
@@ -107,7 +104,6 @@ int main(void) {
                 insert_text_on_index(line_index, symbol_index, lines, buff, append_length);
                 break;
             case 7:
-                // char buff[1000];
                 printf("Type a text to search: ");
                 fgets(buff, sizeof(buff), stdin);
                 size_t search_length = strlen(buff) - 1;
@@ -116,6 +112,9 @@ int main(void) {
                     buff[search_length] = '\0';
                 }
                 search_substring(buff, lines, search_length, line_ptrs_filled);
+                break;
+            case 8:
+                end_program(lines, line_ptrs_filled);
                 break;
         }
     }

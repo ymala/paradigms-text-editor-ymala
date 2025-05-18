@@ -56,17 +56,6 @@ void print_current_text(struct Line** lines, int num_of_lines) {
 void insert_text_on_index(int line_index, int symbol_index, struct Line** lines, char* source, int append_length) {
     struct Line* line_to_insert = lines[line_index];
 
-    // char buff[1000];
-    // if (source == stdin) {
-    //     printf("Type a text to append: ");
-    // }
-    // fgets(buff, sizeof(buff), source);
-    // size_t append_length = strlen(buff) - 1;
-    //
-    // if (buff[append_length] == '\n') {
-    //     buff[append_length] = '\0';
-    // }
-
     while (append_length > line_to_insert->capacity - line_to_insert->filled) {
         alloc_more_symbols_in_line(line_to_insert);
     }
@@ -132,7 +121,6 @@ void load_from_file(char* filename, struct Line** lines, int num_of_lines) {
                 buff[line_length] = '\0';
             }
             add_a_new_line(lines, num_of_lines + lines_added);
-            // insert_text_on_index(num_of_lines + lines_added, 0, lines, file);
             lines_added++;
         }
 

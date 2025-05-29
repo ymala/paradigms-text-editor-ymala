@@ -4,7 +4,7 @@
 
 struct Line** create_line_ptrs_array(void) {
 
-    struct Line** lines = malloc(sizeof(*lines));
+    struct Line **lines = malloc(sizeof(*lines));
     add_a_new_line(lines, 0);
     return lines;
 }
@@ -24,7 +24,7 @@ void alloc_more_symbols_in_line(struct Line* line_ptr) {
 }
 
 struct Line** alloc_more_ptrs_in_array(struct Line** lines, int line_ptrs_array_capacity) {
-    struct Line** new_lines = realloc(lines, sizeof(*lines) * line_ptrs_array_capacity * 2);
+    struct Line **new_lines = realloc(lines, sizeof(*lines) * line_ptrs_array_capacity * 2);
 
     if (new_lines != NULL) {
         return new_lines;

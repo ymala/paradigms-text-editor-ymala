@@ -16,4 +16,8 @@ add_executable(text_editor_cpp oop/main.cpp
         oop/utils.h
         oop/CharArray.cpp
         oop/CharArray.h
+        oop/CharPointerArray.cpp
+        oop/CharPointerArray.h
+        oop/Commands.cpp
+        oop/Commands.h
 )

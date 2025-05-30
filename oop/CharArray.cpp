@@ -46,7 +46,7 @@ char* CharArray::get_substring(int index, int length_to_copy) const {
     memcpy(
         substring,
         symbols_ptr + index,
-        length_to_copy);
+        length_to_copy * sizeof(char));
 
     substring[length_to_copy] = '\0';
 

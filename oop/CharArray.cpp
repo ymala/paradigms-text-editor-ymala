@@ -60,7 +60,7 @@ void CharArray::insert_on_index(char *text_to_insert, int length_to_insert, int 
                "but this line has only %d symbols\n", index, filled);
         return;
     }
-    while (length_to_insert > capacity - index) {
+    while (length_to_insert + filled > capacity) {
         alloc_more_symbols();
     }
 
@@ -78,6 +78,7 @@ void CharArray::insert_on_index(char *text_to_insert, int length_to_insert, int 
         num_of_symbols_after_insertion_place);
 
     filled += length_to_insert;
+    symbols_ptr[filled] = '\0';
     free(symbols_after_insert);
 }
 
@@ -99,6 +100,7 @@ void CharArray::delete_on_index(int length_to_delete, int index) {
     num_of_symbols_after_deleted);
 
     filled -= length_to_delete;
+    symbols_ptr[filled] = '\0';
     free(symbols_after_deleted);
 }
 

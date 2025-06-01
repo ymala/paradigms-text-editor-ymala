@@ -4,21 +4,24 @@
 
 #include "Commands.h"
 
+#include <cstring>
 #include <stdexcept>
 
 InsertCommand::InsertCommand(
     int index,
     CharArray *string_ptr,
     int length_to_insert,
-    char *text_to_insert
+    char *in_text_to_insert
     ) :
 index(index),
-string_ptr(string_ptr),
 length_to_insert(length_to_insert),
-text_to_insert(text_to_insert)
- {}
+string_ptr(string_ptr)
+ {
+     text_to_insert = (char*)malloc(length_to_insert);
+     std::memcpy(text_to_insert, in_text_to_insert, length_to_insert);
+ }
 
-bool InsertCommand::Execute() {
+bool InsertCommand::execute() {
     if (executed) {
         throw std::logic_error("Cannot execute a command that has been already executed.");
     }
@@ -27,7 +30,7 @@ bool InsertCommand::Execute() {
     return true;
 }
 
-bool InsertCommand::Undo() {
+bool InsertCommand::undo() {
     if (not executed) {
         throw std::logic_error("Cannot undo a command that hasn't been executed.");
     }
@@ -55,7 +58,7 @@ DeleteCommand::~DeleteCommand() {
     free(deleted_text);
 }
 
-bool DeleteCommand::Execute() {
+bool DeleteCommand::execute() {
     if (executed) {
         throw std::logic_error("Cannot execute a command that has been already executed.");
     }
@@ -64,7 +67,7 @@ bool DeleteCommand::Execute() {
     return true;
 }
 
-bool DeleteCommand::Undo() {
+bool DeleteCommand::undo() {
     if (not executed) {
         throw std::logic_error("Cannot undo a command that hasn't been executed.");
     }
@@ -77,17 +80,17 @@ bool DeleteCommand::Undo() {
 AddLineCommand::AddLineCommand(
     int line_index,
     int symbol_index,
-    CharPointerArray &char_pointer_array
+    CharPointerArray &line_ptrs
     ): line_index(line_index),
        symbol_index(symbol_index),
-       char_pointer_array(char_pointer_array) {
+       line_ptrs(line_ptrs) {
 
-    int num_ptrs_after_new_line = char_pointer_array.length() - line_index;
-    ptrs_after_new_line = char_pointer_array.get_subsequence(
-        line_index, num_ptrs_after_new_line
+    int num_ptrs_after_new_line = line_ptrs.length() - (line_index + 1);
+    ptrs_after_new_line = line_ptrs.get_subsequence(
+        line_index + 1, num_ptrs_after_new_line
     );
 
-    line_before_new_ptr = char_pointer_array.get(line_index);
+    line_before_new_ptr = line_ptrs.get(line_index);
     num_symbols_pushed_to_new_line = line_before_new_ptr->length() - symbol_index;
     symbols_pushed_to_new_line = line_before_new_ptr->get_substring(
         symbol_index, num_symbols_pushed_to_new_line
@@ -97,9 +100,10 @@ AddLineCommand::AddLineCommand(
 AddLineCommand::~AddLineCommand() {
     free(ptrs_after_new_line);
     free(symbols_pushed_to_new_line);
+    delete new_line_ptr;
 }
 
-bool AddLineCommand::Execute() {
+bool AddLineCommand::execute() {
     if (executed) {
         throw std::logic_error("Cannot execute a command that has been already executed.");
     }
@@ -110,24 +114,20 @@ bool AddLineCommand::Execute() {
         num_symbols_pushed_to_new_line, symbol_index
         );
 
-    char_pointer_array.insert_on_index(line_index, new_line_ptr);
+    line_ptrs.insert_on_index(line_index + 1, new_line_ptr);
 
     executed = true;
     return true;
 }
 
-bool AddLineCommand::Undo() {
+bool AddLineCommand::undo() {
     if (not executed) {
         throw std::logic_error("Cannot undo a command that hasn't been executed.");
     }
     line_before_new_ptr->append(
         symbols_pushed_to_new_line, num_symbols_pushed_to_new_line
         );
-    char_pointer_array.delete_ptr(line_index);
-    delete new_line_ptr;
+    line_ptrs.delete_ptr(line_index + 1);
     executed = false;
     return true;
 }
-
-
-

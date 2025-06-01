@@ -10,8 +10,8 @@
 class Command {
 public:
     virtual ~Command() = default;
-    virtual bool Execute() = 0;
-    virtual bool Undo() = 0;
+    virtual bool execute() = 0;
+    virtual bool undo() = 0;
 };
 
 
@@ -21,10 +21,11 @@ public:
         int index,
         CharArray *string_ptr,
         int length_to_insert,
-        char *text_to_insert);
+        char *in_text_to_insert);
+
     ~InsertCommand() override;
-    bool Execute() override;
-    bool Undo() override;
+    bool execute() override;
+    bool undo() override;
     bool executed = false;
 private:
     int index;
@@ -38,8 +39,8 @@ class DeleteCommand : public Command {
 public:
     DeleteCommand(int index, int length_to_delete, CharArray* string_ptr);
     ~DeleteCommand() override;
-    bool Execute() override;
-    bool Undo() override;
+    bool execute() override;
+    bool undo() override;
     bool executed = false;
 private:
     int const index;
@@ -52,15 +53,15 @@ private:
 
 class AddLineCommand : public Command {
 public:
-    AddLineCommand(int line_index, int symbol_index, CharPointerArray &char_pointer_array);
+    AddLineCommand(int line_index, int symbol_index, CharPointerArray &line_ptrs);
     ~AddLineCommand() override;
-    bool Execute() override;
-    bool Undo() override;
+    bool execute() override;
+    bool undo() override;
     bool executed = false;
 private:
     int const line_index;
     int const symbol_index;
-    CharPointerArray &char_pointer_array;
+    CharPointerArray &line_ptrs;
     CharArray **ptrs_after_new_line;
     char* symbols_pushed_to_new_line;
     int num_symbols_pushed_to_new_line;

@@ -16,6 +16,7 @@ public:
     int get_cursor_line_index() const;
     int get_cursor_symbol_index() const;
     int get_num_of_lines() const;
+    int get_num_of_symbols_from_cursor_to_end_of_line() const;
     bool execute_cmd(Command *cmd_ptr);
     bool undo();
     bool redo();
@@ -37,7 +38,6 @@ private:
     CharPointerArray line_ptrs;
     std::stack<Command*> done_cmds_stack;
     std::stack<Command*> canceled_cmds_stack;
-
 };
 
 void end_program(TextEditor *editor);

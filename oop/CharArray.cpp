@@ -11,13 +11,15 @@ const int CharArray::INITIAL_LINE_CAPACITY = 8;
 
 CharArray::CharArray(int capacity) {
     symbols_ptr = (char *)malloc(sizeof(char) * INITIAL_LINE_CAPACITY);
+    symbols_ptr[0] = '\0';
+    filled = 1;
 }
 
 CharArray::~CharArray() {
     free(symbols_ptr);
 }
 int CharArray::length() const {
-    return filled;
+    return filled - 1;
 }
 
 void CharArray::alloc_more_symbols() {
@@ -55,9 +57,9 @@ char* CharArray::get_substring(int index, int length_to_copy) const {
 
 void CharArray::insert_on_index(char *text_to_insert, int length_to_insert, int index) {
 
-    if (index > filled) {
+    if (index > this->length()) {
         printf("You try to insert on %d, "
-               "but this line has only %d symbols\n", index, filled);
+               "but this line has only %d symbols\n", index, this->length());
         return;
     }
     while (length_to_insert + filled > capacity) {
@@ -78,14 +80,13 @@ void CharArray::insert_on_index(char *text_to_insert, int length_to_insert, int 
         num_of_symbols_after_insertion_place);
 
     filled += length_to_insert;
-    symbols_ptr[filled] = '\0';
     free(symbols_after_insert);
 }
 
 void CharArray::delete_on_index(int length_to_delete, int index) {
-    if (filled < index + length_to_delete) {
+    if (this->length() < index + length_to_delete) {
         printf("You try to delete from %d to %d, "
-               "but this line has only %d symbols\n", index, index + length_to_delete, filled);
+               "but this line has only %d symbols\n", index, index + length_to_delete, this->length());
         throw std::out_of_range("Substring range is out of bounds");
     }
     int num_of_symbols_after_deleted = filled - (index + length_to_delete);
@@ -100,11 +101,10 @@ void CharArray::delete_on_index(int length_to_delete, int index) {
     num_of_symbols_after_deleted);
 
     filled -= length_to_delete;
-    symbols_ptr[filled] = '\0';
     free(symbols_after_deleted);
 }
 
 
 void CharArray::append(char *text_to_append, int length_to_append) {
-    insert_on_index(text_to_append, length_to_append, filled);
+    insert_on_index(text_to_append, length_to_append, this->length());
 }

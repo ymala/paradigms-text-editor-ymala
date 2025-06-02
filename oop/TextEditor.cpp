@@ -34,6 +34,11 @@ int TextEditor::get_num_of_lines() const {
     return line_ptrs.length();
 }
 
+int TextEditor::get_num_of_symbols_from_cursor_to_end_of_line() const {
+    int line_length = line_ptrs.get(cursor.line_index)->length();
+    return line_length - cursor.symbol_index;
+}
+
 bool TextEditor::execute_cmd(Command *cmd_ptr) {
     if (cmd_ptr->execute()) {
         done_cmds_stack.push(cmd_ptr);
@@ -44,13 +49,24 @@ bool TextEditor::execute_cmd(Command *cmd_ptr) {
 
 bool TextEditor::undo() {
     if (done_cmds_stack.empty()) {
-        printf("There is nothing to undo");
+        printf("There is nothing to undo\n");
         return false;
     }
     Command *last_cmd = done_cmds_stack.top();
     done_cmds_stack.pop();
+
     if (last_cmd->undo()) {
         canceled_cmds_stack.push(last_cmd);
+
+        AddLineCommand* add_cmd = dynamic_cast<AddLineCommand*>(last_cmd);
+        InsertCommand* insert_cmd = dynamic_cast<InsertCommand*>(last_cmd);
+
+        if (add_cmd != nullptr) {
+            move_cursor(add_cmd->line_index, add_cmd->symbol_index);
+        }
+        if (insert_cmd != nullptr) {
+            move_cursor(insert_cmd->line_index, insert_cmd->symbol_index);
+        }
         return true;
     }
     return false;
@@ -63,8 +79,22 @@ bool TextEditor::redo() {
     }
     Command *last_canceled_cmd = canceled_cmds_stack.top();
     canceled_cmds_stack.pop();
+
     if (last_canceled_cmd->execute()) {
         done_cmds_stack.push(last_canceled_cmd);
+
+        AddLineCommand* add_cmd = dynamic_cast<AddLineCommand*>(last_canceled_cmd);
+        InsertCommand* insert_cmd = dynamic_cast<InsertCommand*>(last_canceled_cmd);
+
+        if (add_cmd != nullptr) {
+            move_cursor(add_cmd->line_index + 1, 0);
+        }
+        if (insert_cmd != nullptr) {
+            move_cursor(
+                insert_cmd->line_index,
+                insert_cmd->symbol_index + insert_cmd->length_to_insert
+                );
+        }
         return true;
     }
     return false;
@@ -77,15 +107,15 @@ void TextEditor::move_cursor(int line_index, int symbol_index) {
             );
         return;
     }
-    if (symbol_index > line_ptrs.get(line_index)->length() + 1) {
-        printf("Can't move to line %d with 0-based index. Only %d lines",
-            line_index, line_ptrs.length()
+    if (symbol_index > line_ptrs.get(line_index)->length()) {
+        printf("Can't move to symbol %d with 0-based index. Only %d symbols",
+            symbol_index, line_ptrs.get(line_index)->length()
     );
         return;
     }
     cursor.line_index = line_index;
     cursor.symbol_index = symbol_index;
-    printf("Cursor moved\n");
+    printf("Cursor moved to %d %d\n", line_index, symbol_index);
 
 }
 
@@ -153,6 +183,7 @@ void TextEditor::print_to_console() const {
 
 void TextEditor::insert_text(int length_to_insert, char *text_to_insert) {
     Command *cmd = new InsertCommand(
+        cursor.line_index,
         cursor.symbol_index,
         line_ptrs.get(cursor.line_index),
         length_to_insert,
@@ -160,7 +191,10 @@ void TextEditor::insert_text(int length_to_insert, char *text_to_insert) {
         );
     if (cmd->execute()) {
         done_cmds_stack.push(cmd);
-        move_cursor(cursor.line_index, cursor.symbol_index + length_to_insert);
+        move_cursor(
+            cursor.line_index,
+            cursor.symbol_index + length_to_insert
+            );
     }
 }
 
@@ -202,7 +236,7 @@ void TextEditor::copy(int length_to_copy) {
 
 void TextEditor::paste() {
     if (buffer->length() == 0) {
-        printf("Nothing has been copied");
+        printf("Nothing has been copied\n");
         return;
     }
     insert_text(buffer->length(), buffer->symbols_ptr);

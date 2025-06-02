@@ -18,7 +18,8 @@ public:
 class InsertCommand : public Command {
 public:
     InsertCommand(
-        int index,
+        int line_index,
+        int symbol_index,
         CharArray *string_ptr,
         int length_to_insert,
         char *in_text_to_insert);
@@ -27,9 +28,10 @@ public:
     bool execute() override;
     bool undo() override;
     bool executed = false;
-private:
-    int index;
     int length_to_insert;
+    int const line_index;
+    int const symbol_index;
+private:
     CharArray* string_ptr;
     char *text_to_insert;
 };
@@ -42,9 +44,9 @@ public:
     bool execute() override;
     bool undo() override;
     bool executed = false;
-private:
-    int const index;
+    int const symbol_index;
     int const length_to_delete;
+private:
     CharArray* string_ptr;
     char *deleted_text;
 
@@ -58,9 +60,9 @@ public:
     bool execute() override;
     bool undo() override;
     bool executed = false;
-private:
     int const line_index;
     int const symbol_index;
+private:
     CharPointerArray &line_ptrs;
     CharArray **ptrs_after_new_line;
     char* symbols_pushed_to_new_line;

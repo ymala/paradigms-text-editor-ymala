@@ -61,9 +61,10 @@ int main() {
             }
             case 7: {
                 printf("Insert with replacement..");
+                int num_to_delete = editor->get_num_of_symbols_from_cursor_to_end_of_line();
                 char *text = get_text_from_user(text_length_ptr);
                 editor->insert_text(text_length, text);
-                editor->delete_text(text_length);
+                editor->delete_text(num_to_delete);
                 free(text);
                 break;
             }

@@ -8,12 +8,14 @@
 #include <stdexcept>
 
 InsertCommand::InsertCommand(
-    int index,
+    int  line_index,
+    int  symbol_index,
     CharArray *string_ptr,
     int length_to_insert,
     char *in_text_to_insert
     ) :
-index(index),
+line_index(line_index),
+symbol_index(symbol_index),
 length_to_insert(length_to_insert),
 string_ptr(string_ptr)
  {
@@ -23,18 +25,18 @@ string_ptr(string_ptr)
 
 bool InsertCommand::execute() {
     if (executed) {
-        throw std::logic_error("Cannot execute a command that has been already executed.");
+        throw std::logic_error("Cannot execute a command that has been already executed.\n");
     }
-    string_ptr->insert_on_index(text_to_insert, length_to_insert, index);
+    string_ptr->insert_on_index(text_to_insert, length_to_insert, symbol_index);
     executed = true;
     return true;
 }
 
 bool InsertCommand::undo() {
     if (not executed) {
-        throw std::logic_error("Cannot undo a command that hasn't been executed.");
+        throw std::logic_error("Cannot undo a command that hasn't been executed.\n");
     }
-    string_ptr->delete_on_index(length_to_insert, index);
+    string_ptr->delete_on_index(length_to_insert, symbol_index);
     executed = false;
     return true;
 }
@@ -48,7 +50,7 @@ DeleteCommand::DeleteCommand(
     int length_to_delete,
     CharArray *string_ptr
     ):
-index(index),
+symbol_index(index),
 length_to_delete(length_to_delete),
 string_ptr(string_ptr) {
     deleted_text = string_ptr->get_substring(index, length_to_delete);
@@ -60,18 +62,18 @@ DeleteCommand::~DeleteCommand() {
 
 bool DeleteCommand::execute() {
     if (executed) {
-        throw std::logic_error("Cannot execute a command that has been already executed.");
+        throw std::logic_error("Cannot execute a command that has been already executed.\n");
     }
-    string_ptr->delete_on_index(length_to_delete, index);
+    string_ptr->delete_on_index(length_to_delete, symbol_index);
     executed = true;
     return true;
 }
 
 bool DeleteCommand::undo() {
     if (not executed) {
-        throw std::logic_error("Cannot undo a command that hasn't been executed.");
+        throw std::logic_error("Cannot undo a command that hasn't been executed.\n");
     }
-    string_ptr->insert_on_index(deleted_text, length_to_delete, index);
+    string_ptr->insert_on_index(deleted_text, length_to_delete, symbol_index);
     executed = false;
     return true;
 }
@@ -105,7 +107,7 @@ AddLineCommand::~AddLineCommand() {
 
 bool AddLineCommand::execute() {
     if (executed) {
-        throw std::logic_error("Cannot execute a command that has been already executed.");
+        throw std::logic_error("Cannot execute a command that has been already executed.\n");
     }
     new_line_ptr->append(
         symbols_pushed_to_new_line, num_symbols_pushed_to_new_line
@@ -122,7 +124,7 @@ bool AddLineCommand::execute() {
 
 bool AddLineCommand::undo() {
     if (not executed) {
-        throw std::logic_error("Cannot undo a command that hasn't been executed.");
+        throw std::logic_error("Cannot undo a command that hasn't been executed.\n");
     }
     line_before_new_ptr->append(
         symbols_pushed_to_new_line, num_symbols_pushed_to_new_line

@@ -61,8 +61,8 @@ int get_length_from_user() {
     printf("Enter length: ");
     if (scanf("%d", &text_length) != 1) {
         printf("Invalid input. One integer expected\n");
-        while ((ch = getchar()) != '\n' && ch != EOF);
     }
+    while ((ch = getchar()) != '\n' && ch != EOF);
     return text_length;
 }
 

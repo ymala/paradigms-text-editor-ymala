@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "TextEditor.h"
+#include "UserCommands.h"
 #include "utils.h"
 
 
@@ -23,90 +24,102 @@ int main() {
         int text_length = 0;
         int *text_length_ptr = &text_length;
 
+        bool allowed = editor->validate_user_cmd(command_num);
+
+        if (!allowed) {
+            printf("Command couldn't be applied to the current line type");
+            continue;
+        }
+
         switch (command_num) {
-            case 1: {
+            case UserCommands::INSERT_TEXT_ON_CURSOR: {
                 printf("Add on cursor. ");
                 char *text = get_text_from_user(text_length_ptr);
                 editor->insert_text(text_length, text);
                 free(text);
                 break;
             }
-            case 2:
-                editor->start_line();
+            case UserCommands::ADD_NEW_CHAR_LINE:
+                editor->add_char_line();
                 printf("New line started\n");
                 break;
-            case 3: {
+            case UserCommands::SAVE_TO_FILE: {
                 printf("Name of file? ");
                 char *filename = get_text_from_user();
                 editor->save_to_file(filename);
                 free(filename);
                 break;
             }
-            case 4: {
+            case UserCommands::LOAD_FROM_FILE: {
                 printf("Name of file? ");
                 char *filename = get_text_from_user();
                 editor->load_from_file(filename);
                 free(filename);
                 break;
             }
-            case 5:
+            case UserCommands::PRINT_TO_CONSOLE:
                 editor->print_to_console();
                 break;
-            case 6: {
+            case UserCommands::MOVE_CURSOR: {
                 int line_index;
                 int symbol_index;
                 get_index_from_user(line_index, symbol_index);
                 editor->move_cursor(line_index, symbol_index);
                 break;
             }
-            case 7: {
+            case UserCommands::INSERT_WITH_REPLACEMENT: {
                 printf("Insert with replacement..");
-                int num_to_delete = editor->get_num_of_symbols_from_cursor_to_end_of_line();
+
+                int num_of_symbols_to_end = editor->get_num_of_symbols_from_cursor_to_end_of_line();
                 char *text = get_text_from_user(text_length_ptr);
                 editor->insert_text(text_length, text);
-                editor->delete_text(num_to_delete);
+                editor->delete_text(std::min(num_of_symbols_to_end, text_length));
                 free(text);
                 break;
             }
-            case 8: {
+            case UserCommands::SEARCH_TEXT: {
                 printf("What to look for? ");
                 char *text = get_text_from_user(text_length_ptr);
                 editor->search_text(text_length, text);
                 free(text);
                 break;
             }
-            case 9: {
+            case UserCommands::DELETE_TEXT: {
                 printf("How many symbols to delete? ");
                 int length_to_delete = get_length_from_user();
                 editor->delete_text(length_to_delete);
                 break;
             }
-            case 10: {
+            case UserCommands::CUT: {
                 printf("How many symbols to cut? ");
                 int length_to_cut = get_length_from_user();
                 editor->copy(length_to_cut);
                 editor->delete_text(length_to_cut);
                 break;
             }
-            case 11: {
+            case UserCommands::COPY: {
                 printf("How many symbols to copy? ");
                 int length_to_copy = get_length_from_user();
                 editor->copy(length_to_copy);
                 break;
             }
-            case 12: {
+            case UserCommands::PASTE: {
                 editor->paste();
                 break;
             }
-            case 13: {
+            case UserCommands::UNDO: {
                 editor->undo();
                 break;
             }
-            case 14: {
+            case UserCommands::REDO: {
                 editor->redo();
                 break;
             }
-            case 15:
+
+
+
+
+            case UserCommands::END_PROGRAM:
                 end_program(editor);
                 break;
         }

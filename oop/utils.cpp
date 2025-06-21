@@ -5,25 +5,17 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
+#include "UserCommands.h"
 #include "TextEditor.h"
 
 void print_help() {
-    printf("Commands:\n"
-           "1 - Insert on cursor\n"
-           "2 - Start new line\n"
-           "3 - Save to file        4 - Load from file\n" //зараз вставляє в кінець файлу, а не на курсор
-           "5 - Print to console\n"
-           "6 - Move cursor \n"
-           "7 - Insert with replacement \n"
-           "8 - Search text\n"
-           "9 - Delete text \n"
-           "10 - Cut \n"
-           "11 - Copy \n"
-           "12 - Paste \n"
-           "13 - Undo               14 - Redo \n"
-           "15 - END PROGRAM\n");
+    for (const auto& cmd : commands) {
+        std::cout << cmd.id << " - " << cmd.description << "\n";
+    }
 }
+
 
 char* get_text_from_user(int* out_length) {
     char buff[1000];

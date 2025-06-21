@@ -82,7 +82,7 @@ bool DeleteCommand::undo() {
 AddLineCommand::AddLineCommand(
     int line_index,
     int symbol_index,
-    CharPointerArray &line_ptrs
+    LinePointerArray &line_ptrs
     ): line_index(line_index),
        symbol_index(symbol_index),
        line_ptrs(line_ptrs) {
@@ -93,10 +93,19 @@ AddLineCommand::AddLineCommand(
     );
 
     line_before_new_ptr = line_ptrs.get(line_index);
-    num_symbols_pushed_to_new_line = line_before_new_ptr->length() - symbol_index;
-    symbols_pushed_to_new_line = line_before_new_ptr->get_substring(
-        symbol_index, num_symbols_pushed_to_new_line
-    );
+
+    CharLine *char_line_before_new = dynamic_cast<CharLine *>(line_before_new_ptr);
+    if (char_line_before_new != nullptr) {
+        num_symbols_pushed_to_new_line = char_line_before_new->char_arr_ptr->length() - symbol_index;
+        symbols_pushed_to_new_line = char_line_before_new->char_arr_ptr->get_substring(
+            symbol_index, num_symbols_pushed_to_new_line
+        );
+    } else {
+        static char dummy = '\0';
+        num_symbols_pushed_to_new_line = 0;
+        symbols_pushed_to_new_line = &dummy;
+    }
+
 }
 
 AddLineCommand::~AddLineCommand() {
@@ -109,13 +118,16 @@ bool AddLineCommand::execute() {
     if (executed) {
         throw std::logic_error("Cannot execute a command that has been already executed.\n");
     }
-    new_line_ptr->append(
+    new_line_ptr->char_arr_ptr->append(
         symbols_pushed_to_new_line, num_symbols_pushed_to_new_line
         );
-    line_before_new_ptr->delete_on_index(
+
+    CharLine *char_line_before_new = dynamic_cast<CharLine *>(line_before_new_ptr);
+    if (char_line_before_new != nullptr) {
+        char_line_before_new->char_arr_ptr->delete_on_index(
         num_symbols_pushed_to_new_line, symbol_index
         );
-
+    }
     line_ptrs.insert_on_index(line_index + 1, new_line_ptr);
 
     executed = true;
@@ -126,9 +138,12 @@ bool AddLineCommand::undo() {
     if (not executed) {
         throw std::logic_error("Cannot undo a command that hasn't been executed.\n");
     }
-    line_before_new_ptr->append(
-        symbols_pushed_to_new_line, num_symbols_pushed_to_new_line
-        );
+    CharLine *char_line_before_new = dynamic_cast<CharLine *>(line_before_new_ptr);
+    if (char_line_before_new != nullptr) {
+        char_line_before_new->char_arr_ptr->append(
+            symbols_pushed_to_new_line, num_symbols_pushed_to_new_line
+            );
+    }
     line_ptrs.delete_ptr(line_index + 1);
     executed = false;
     return true;

@@ -16,10 +16,19 @@ add_executable(text_editor_cpp oop/main.cpp
         oop/utils.h
         oop/CharArray.cpp
         oop/CharArray.h
-        oop/CharPointerArray.cpp
-        oop/CharPointerArray.h
+        oop/LinePointerArray.cpp
+        oop/LinePointerArray.h
         oop/Commands.cpp
         oop/Commands.h
+        oop/Line.h
+        oop/СontactLine.cpp
+        oop/СontactLine.h
+        oop/TaskLine.cpp
+        oop/TaskLine.h
+        oop/CharLine.cpp
+        oop/CharLine.h
+        oop/UserCommands.h
+        oop/UserCommands.cpp
 )
 
 add_executable(caesar caesar_encryption/main.cpp

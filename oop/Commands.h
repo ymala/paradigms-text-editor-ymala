@@ -5,7 +5,8 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 #include "CharArray.h"
-#include "CharPointerArray.h"
+#include "CharLine.h"
+#include "LinePointerArray.h"
 
 class Command {
 public:
@@ -55,7 +56,7 @@ private:
 
 class AddLineCommand : public Command {
 public:
-    AddLineCommand(int line_index, int symbol_index, CharPointerArray &line_ptrs);
+    AddLineCommand(int line_index, int symbol_index, LinePointerArray &line_ptrs);
     ~AddLineCommand() override;
     bool execute() override;
     bool undo() override;
@@ -63,12 +64,17 @@ public:
     int const line_index;
     int const symbol_index;
 private:
-    CharPointerArray &line_ptrs;
-    CharArray **ptrs_after_new_line;
+    LinePointerArray &line_ptrs;
+    Line **ptrs_after_new_line;
     char* symbols_pushed_to_new_line;
     int num_symbols_pushed_to_new_line;
-    CharArray* new_line_ptr = new CharArray;
-    CharArray* line_before_new_ptr;
+    CharLine* new_line_ptr = new CharLine;
+    Line* line_before_new_ptr;
 };
+
+
+class AddContactCommand : public Command {};
+
+class AddTaskCommand : public Command {};
 
 #endif //COMMANDS_H

@@ -108,3 +108,13 @@ void CharArray::delete_on_index(int length_to_delete, int index) {
 void CharArray::append(char *text_to_append, int length_to_append) {
     insert_on_index(text_to_append, length_to_append, this->length());
 }
+
+void CharArray::append_null_term_str(char *text_to_append) {
+    int length_to_append = std::strlen(text_to_append);
+    append(text_to_append, length_to_append);
+}
+
+void CharArray::clear() {
+    filled = 1;
+    symbols_ptr[0] = '\0';
+}

@@ -21,8 +21,8 @@ add_executable(text_editor_cpp oop/main.cpp
         oop/Commands.cpp
         oop/Commands.h
         oop/Line.h
-        oop/СontactLine.cpp
-        oop/СontactLine.h
+        oop/ContactLine.cpp
+        oop/ContactLine.h
         oop/TaskLine.cpp
         oop/TaskLine.h
         oop/CharLine.cpp

@@ -27,7 +27,7 @@ int main() {
         bool allowed = editor->validate_user_cmd(command_num);
 
         if (!allowed) {
-            printf("Command couldn't be applied to the current line type");
+            printf("Command couldn't be applied to the current line type\n");
             continue;
         }
 
@@ -46,14 +46,14 @@ int main() {
             case UserCommands::SAVE_TO_FILE: {
                 printf("Name of file? ");
                 char *filename = get_text_from_user();
-                editor->save_to_file(filename);
+                editor->save_obj_to_file(filename);
                 free(filename);
                 break;
             }
             case UserCommands::LOAD_FROM_FILE: {
                 printf("Name of file? ");
                 char *filename = get_text_from_user();
-                editor->load_from_file(filename);
+                editor->load_obj_from_file(filename);
                 free(filename);
                 break;
             }
@@ -115,12 +115,35 @@ int main() {
                 editor->redo();
                 break;
             }
+            case UserCommands::ADD_CONTACT: {
+                printf("Contact name?\n");
+                char *name = get_text_from_user(text_length_ptr);
+                printf("Contact email?\n");
+                char *email = get_text_from_user(text_length_ptr);
 
+                editor->add_contact(name, email);
+                break;
+            }
+            case UserCommands::ADD_TASK: {
+                printf("Task description?\n");
+                char *descr = get_text_from_user(text_length_ptr);
+                editor->add_task(descr);
+                break;
+            }
 
+            case UserCommands::DELETE_LINE_OBJ: {
+                editor->delete_line_obj();
+                break;;
+            }
 
+            case UserCommands::CHANGE_TASK_STATUS: {
+                editor->change_task_status();
+                break;
+            }
 
             case UserCommands::END_PROGRAM:
                 end_program(editor);
+                // є якась проблема з делейтом
                 break;
         }
     }

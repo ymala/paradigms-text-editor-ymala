@@ -34,7 +34,6 @@ char* get_text_from_user(int* out_length) {
     if (out_length != nullptr) {
         *out_length = (int)line_length;
     }
-
     return result;
 }
 

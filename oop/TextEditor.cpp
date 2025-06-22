@@ -4,6 +4,10 @@
 
 #include "TextEditor.h"
 
+#include <fstream>
+#include <iostream>
+#include <filesystem>
+
 #include "CharLine.h"
 #include "TaskLine.h"
 #include "UserCommands.h"
@@ -68,16 +72,6 @@ bool TextEditor::undo() {
 
     if (last_cmd->undo()) {
         canceled_cmds_stack.push(last_cmd);
-
-        AddLineCommand* add_cmd = dynamic_cast<AddLineCommand*>(last_cmd);
-        InsertCommand* insert_cmd = dynamic_cast<InsertCommand*>(last_cmd);
-
-        if (add_cmd != nullptr) {
-            move_cursor(add_cmd->line_index, add_cmd->symbol_index);
-        }
-        if (insert_cmd != nullptr) {
-            move_cursor(insert_cmd->line_index, insert_cmd->symbol_index);
-        }
         return true;
     }
     return false;
@@ -85,7 +79,7 @@ bool TextEditor::undo() {
 
 bool TextEditor::redo() {
     if (canceled_cmds_stack.empty()) {
-        printf("There is nothing to redo");
+        printf("There is nothing to redo\n");
         return false;
     }
     Command *last_canceled_cmd = canceled_cmds_stack.top();
@@ -93,19 +87,6 @@ bool TextEditor::redo() {
 
     if (last_canceled_cmd->execute()) {
         done_cmds_stack.push(last_canceled_cmd);
-
-        AddLineCommand* add_cmd = dynamic_cast<AddLineCommand*>(last_canceled_cmd);
-        InsertCommand* insert_cmd = dynamic_cast<InsertCommand*>(last_canceled_cmd);
-
-        if (add_cmd != nullptr) {
-            move_cursor(add_cmd->line_index + 1, 0);
-        }
-        if (insert_cmd != nullptr) {
-            move_cursor(
-                insert_cmd->line_index,
-                insert_cmd->symbol_index + insert_cmd->length_to_insert
-                );
-        }
         return true;
     }
     return false;
@@ -143,16 +124,58 @@ void TextEditor::move_cursor(int line_index, int symbol_index) {
 }
 
 void TextEditor::add_char_line() {
+    CharLine *obj_ptr = new CharLine();
     Command *cmd = new AddLineCommand(
-        cursor.line_index, cursor.symbol_index, line_ptrs
+        cursor.line_index,
+        cursor.symbol_index,
+        line_ptrs, obj_ptr,
+        cursor.line_index,
+        cursor.symbol_index
         );
     if (cmd->execute()) {
         done_cmds_stack.push(cmd);
-        move_cursor(cursor.line_index + 1, 0);
     }
 }
 
-void TextEditor::save_to_file(char *filename) const {
+void TextEditor::add_contact(char *name, char *email) {
+    Line *obj_ptr = new ContactLine(name, email);
+
+    Command *cmd = new AddObjCommand(
+        cursor.line_index,
+        line_ptrs,
+        obj_ptr,
+        cursor.line_index);
+
+    if (cmd->execute()) {
+        done_cmds_stack.push(cmd);
+    }
+}
+
+void TextEditor::add_task(char *description) {
+    Line *obj_ptr = new TaskLine(description);
+
+    Command *cmd = new AddObjCommand(
+    cursor.line_index,
+    line_ptrs,
+    obj_ptr,
+    cursor.line_index);
+
+    if (cmd->execute()) {
+        done_cmds_stack.push(cmd);
+    }
+}
+
+void TextEditor::delete_line_obj() {
+    Command *cmd = new DeleteLineObj(
+        cursor.line_index, line_ptrs, cursor.line_index
+        );
+    if (cmd->execute()) {
+        done_cmds_stack.push(cmd);
+    }
+}
+
+
+void TextEditor::save_text_repr_to_file(char *filename) const {
     FILE *file = fopen(filename, "w");
     if (file != nullptr)
     {
@@ -172,7 +195,7 @@ void TextEditor::save_to_file(char *filename) const {
     printf("Can't open such a file... Try another filename \n");
 }
 
-void TextEditor::load_from_file(char *filename) {
+void TextEditor::load_text_repr_from_file(char *filename) {
     FILE *file = fopen(filename, "r");
     if (file != nullptr)
     {
@@ -200,7 +223,8 @@ void TextEditor::load_from_file(char *filename) {
 
 void TextEditor::print_to_console() const {
     for (int i = 0; i < line_ptrs.length(); i++) {
-        printf("%s \n", line_ptrs.get(i)->str_repr_ptr()->symbols_ptr);
+        CharArray *repr = line_ptrs.get(i)->str_repr_ptr();
+        printf("%s \n", repr->symbols_ptr);
     }
 }
 
@@ -212,7 +236,8 @@ void TextEditor::insert_text(int length_to_insert, char *text_to_insert) {
         cursor.symbol_index,
         current_line->char_arr_ptr,
         length_to_insert,
-        text_to_insert
+        text_to_insert,
+        cursor.symbol_index
         );
     if (cmd->execute()) {
         done_cmds_stack.push(cmd);
@@ -272,6 +297,12 @@ void TextEditor::paste() {
     printf("Paste on cursor..\n");
 }
 
+void TextEditor::change_task_status() {
+    TaskLine* task_line_ptr = dynamic_cast<TaskLine*>(line_ptrs.get(cursor.line_index));
+    task_line_ptr->status = !(task_line_ptr->status);
+}
+
+
 bool TextEditor::validate_user_cmd(int cmd_num) {
     if (cmd_num == UserCommands::ADD_CONTACT
         || cmd_num == UserCommands::ADD_NEW_CHAR_LINE
@@ -308,7 +339,55 @@ bool TextEditor::validate_user_cmd(int cmd_num) {
     if (task_line_ptr != nullptr && cmd_num == UserCommands::CHANGE_TASK_STATUS) {
         return true;
     }
-
     return false;
 }
+
+void TextEditor::save_obj_to_file(char *filename) const {
+    std::ofstream file(filename, std::ios::binary);
+    if (!file) {
+        printf("Failed to open file for writing\n");
+        return;
+    }
+    std::cout << std::filesystem::current_path() << std::endl;
+    int32_t num_of_lines = line_ptrs.length();
+    file.write(reinterpret_cast<const char*> (&num_of_lines), sizeof(num_of_lines));
+
+    for (int i = 0; i < num_of_lines; i++) {
+        line_ptrs.get(i)->serialize_to_file(file);
+    }
+}
+
+void TextEditor::load_obj_from_file(char *filename) {
+    std::ifstream file(filename, std::ios::binary);
+
+    if (!file) {
+        printf("Failed to open file for reading\n");
+        return;
+    }
+
+    int32_t num_of_lines;
+    file.read(reinterpret_cast<char*>(&num_of_lines), sizeof(num_of_lines));
+
+    for (int i = 0; i < num_of_lines; i++) {
+        Line *obj = nullptr;
+        char type_buffer[5];
+        file.read(type_buffer, 4);
+        type_buffer[4] = '\0';
+
+        if (strcmp(type_buffer, "TASK") == 0) {
+            obj = new TaskLine(file);
+
+        } else if (strcmp(type_buffer, "CONT") == 0) {
+            obj = new ContactLine(file);
+
+        } else if (strcmp(type_buffer, "TEXT") == 0) {
+            obj = new CharLine(file);
+        }
+
+        if (obj != nullptr) {
+            line_ptrs.append(obj);
+        }
+    }
+}
+
 

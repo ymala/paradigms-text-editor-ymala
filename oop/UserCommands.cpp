@@ -23,7 +23,7 @@ std::vector<CommandInfo> commands = {
     {UserCommands::ADD_TASK,                 "Add task"},
     {UserCommands::ENCRYPT_ALL,              "Encrypt all data"},
     {UserCommands::DECRYPT_ALL,              "Decrypt all data"},
-    {UserCommands::DELETE_LINE_OBJ,          "Delete any line object"},
+    {UserCommands::DELETE_LINE_OBJ,          "Delete current line object (except 1st line)"},
     {UserCommands::CHANGE_TASK_STATUS,       "Change task status"},
     {UserCommands::END_PROGRAM,              "End program"}
 };

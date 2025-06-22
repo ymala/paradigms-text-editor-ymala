@@ -9,13 +9,17 @@
 
 class TaskLine : public Line {
 public:
-    TaskLine();
+    explicit TaskLine(char *in_description);
+    explicit TaskLine(std::ifstream& file);
     bool status = false;
     CharArray *description = new CharArray();
+    void serialize_to_file(std::ofstream& file) const override;
+    CharArray *str_repr_ptr() override;
+
+private:
     CharArray *done_displ = new CharArray();
     CharArray *undone_displ = new CharArray();
-
-    CharArray *str_repr_ptr() override;
+    void status_dispr_fill();
 };
 
 

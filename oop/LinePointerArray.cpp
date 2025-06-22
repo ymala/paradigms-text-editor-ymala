@@ -78,14 +78,13 @@ int LinePointerArray::length() const {
     return filled;
 }
 
-void LinePointerArray::delete_ptr(int index) {
+void LinePointerArray::extract_ptr(int index) {
     if (index >= filled) {
         printf("You try to delete line with 0-based index %d "
                "but there are only %d lines\n", index, filled);
         throw std::out_of_range("Index is out of bounds");
     }
 
-    delete lines_ptr[index];
     int num_of_ptrs_after_deleted = filled - (index + 1);
 
     memmove(
@@ -95,6 +94,8 @@ void LinePointerArray::delete_ptr(int index) {
         );
     filled--;
 }
+
+
 
 Line **LinePointerArray::get_subsequence(int index, int length_to_copy) const {
     if (filled < index + length_to_copy) {

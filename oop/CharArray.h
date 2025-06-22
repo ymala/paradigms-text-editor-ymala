@@ -16,6 +16,8 @@ public:
     char* get_substring(int index, int length_to_copy) const;
     void delete_on_index(int length_to_delete, int index);
     int length() const;
+    void append_null_term_str(char *text_to_append);
+    void clear();
 
 
 private:

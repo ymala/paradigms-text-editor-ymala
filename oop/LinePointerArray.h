@@ -14,7 +14,7 @@ public:
     void append(Line *ptr_to_line);
     void insert_on_index(int index, Line *ptr_to_line);
     Line* get(int index) const;
-    void delete_ptr(int index);
+    void extract_ptr(int index);
     Line** get_subsequence(int index, int length_to_copy) const;
     int length() const;
 

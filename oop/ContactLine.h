@@ -7,12 +7,17 @@
 #include "Line.h"
 
 
-class СontactLine : public Line {
+class ContactLine : public Line {
 public:
+    ContactLine(char *in_name, char *in_email);
+    explicit ContactLine(std::ifstream& file);
     CharArray *name = new CharArray();
     CharArray *email = new CharArray();
-
     CharArray *str_repr_ptr() override;
+    void serialize_to_file(std::ofstream& file) const override;
+private:
+    CharArray *repr = new CharArray();;
+    void repr_fill();
 };
 
 

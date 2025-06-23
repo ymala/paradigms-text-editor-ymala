@@ -15,6 +15,7 @@
 TextEditor::TextEditor() {
     CharLine* first_line_ptr = new CharLine;
     line_ptrs.insert_on_index(0, first_line_ptr);
+    encryptor = new CaesarCipher();
 }
 
 TextEditor::~TextEditor() {
@@ -390,4 +391,33 @@ void TextEditor::load_obj_from_file(char *filename) {
     }
 }
 
+void TextEditor::encrypt_instance(int key) {
+
+    for (int i = 0; i < line_ptrs.length(); i++) {
+        Line *obj = line_ptrs.get(i);
+        std::vector<CharArray*> text_fields = obj->get_text_fields();
+
+        for (CharArray* field : text_fields) {
+                char* char_ptr = field->symbols_ptr;
+                char *encrypted_char_ptr = encryptor->encrypt(char_ptr, key);
+                field->clear();
+                field->append_null_term_str(encrypted_char_ptr);
+            }
+    }
+}
+
+void TextEditor::decrypt_instance(int key) {
+
+    for (int i = 0; i < line_ptrs.length(); i++) {
+        Line *obj = line_ptrs.get(i);
+        std::vector<CharArray*> text_fields = obj->get_text_fields();
+
+        for (CharArray* field : text_fields) {
+            char* char_ptr = field->symbols_ptr;
+            char *decrypted_char_ptr = encryptor->decrypt(char_ptr, key);
+            field->clear();
+            field->append_null_term_str(decrypted_char_ptr);
+        }
+    }
+}
 

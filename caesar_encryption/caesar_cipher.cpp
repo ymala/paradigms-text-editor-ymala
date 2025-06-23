@@ -1,63 +1,41 @@
-#include <cctype>
 #include <stdexcept>
+#include <vector>
 
 extern "C" {
 
-    __attribute__((visibility("default")))
-char* get_encrypted(char* raw_text, int key) {
-    int text_length = 0;
-    while (raw_text[text_length] != '\0') {
-        text_length++;
-    }
-    char *encrypted_text = (char*)malloc(text_length + 1);
+    const int ALPHABET_SIZE = 26;
+    const int UPPERCASE_BASE = 65;
+    const int LOWERCASE_BASE = 97;
 
-    int i = 0;
-    for (i = 0; i < text_length; i++) {
-        if (std::isalpha(raw_text[i])) {
-            int base = 65;
-            if (std::islower(raw_text[i])) {
-                base = 97;
+    char* process_text(const char* text, int key, bool encrypt) {
+        if (!text) return nullptr;
+
+        size_t length = strlen(text);
+        char* result = static_cast<char*>(malloc(length + 1));
+        if (!result) return nullptr;
+
+        for (size_t i = 0; i < length; i++) {
+            if (std::isalpha(text[i])) {
+                int base = std::isupper(text[i]) ? UPPERCASE_BASE : LOWERCASE_BASE;
+                int shift = encrypt ? key : -key;
+
+                int shifted = (text[i] - base + shift + ALPHABET_SIZE) % ALPHABET_SIZE;
+                result[i] = static_cast<char>(shifted + base);
+            } else {
+                result[i] = text[i];
             }
-            int index = raw_text[i];
-            encrypted_text[i] = static_cast<char>(
-                (index - base + key) % 26 + base
-                );
         }
-        else {
-            encrypted_text[i] = raw_text[i];
-        }
+        result[length] = '\0';
+        return result;
     }
-    encrypted_text[text_length] = '\0';
-    return encrypted_text;
-}
-
 
     __attribute__((visibility("default")))
-char* get_decrypted(char* encrypted_text, int key) {
-    int text_length = 0;
-    while (encrypted_text[text_length] != '\0') {
-        text_length++;
+    char* get_encrypted(char* raw_text, int key) {
+        return process_text(raw_text, key, true);
     }
-    char *decrypted_text = (char*)malloc(text_length + 1);
 
-    int i = 0;
-    for (i = 0; i < text_length; i++) {
-        if (std::isalpha(encrypted_text[i])) {
-            int base = 65;
-            if (std::islower(encrypted_text[i])) {
-                base = 97;
-            }
-            int index = encrypted_text[i];
-            decrypted_text[i] = static_cast<char>(
-                (index - base - key + 26) % 26 + base
-                );
-        }
-        else {
-            decrypted_text[i] = encrypted_text[i];
-        }
+    __attribute__((visibility("default")))
+    char* get_decrypted(char* encrypted_text, int key) {
+        return process_text(encrypted_text, key, false);
     }
-    decrypted_text[text_length] = '\0';
-    return decrypted_text;
 }
-
-    }

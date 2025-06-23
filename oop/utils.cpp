@@ -49,7 +49,7 @@ void get_index_from_user(int &line_index, int &symbol_index) {
 int get_length_from_user() {
     int ch;
     int text_length = 0;
-    printf("Enter length: ");
+    printf("Enter number: ");
     if (scanf("%d", &text_length) != 1) {
         printf("Invalid input. One integer expected\n");
     }

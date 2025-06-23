@@ -29,6 +29,8 @@ add_executable(text_editor_cpp oop/main.cpp
         oop/CharLine.h
         oop/UserCommands.h
         oop/UserCommands.cpp
+        oop/CaesarCipher.cpp
+        oop/CaesarCipher.h
 )
 
 add_executable(caesar caesar_encryption/main.cpp

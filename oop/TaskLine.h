@@ -15,6 +15,7 @@ public:
     CharArray *description = new CharArray();
     void serialize_to_file(std::ofstream& file) const override;
     CharArray *str_repr_ptr() override;
+    std::vector<CharArray*> get_text_fields() override;
 
 private:
     CharArray *done_displ = new CharArray();

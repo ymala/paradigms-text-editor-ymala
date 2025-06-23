@@ -9,6 +9,7 @@ int main() {
     print_help();
     TextEditor *editor = new TextEditor;
 
+
     while (true) {
         int command_num;
         printf("Type a number of a command: ");
@@ -134,6 +135,20 @@ int main() {
             case UserCommands::DELETE_LINE_OBJ: {
                 editor->delete_line_obj();
                 break;;
+            }
+
+            case UserCommands::ENCRYPT_ALL: {
+                printf("Key?\n");
+                int key = get_length_from_user();
+                editor->encrypt_instance(key);
+                break;
+            }
+
+            case UserCommands::DECRYPT_ALL: {
+                printf("Key?\n");
+                int key = get_length_from_user();
+                editor->decrypt_instance(key);
+                break;
             }
 
             case UserCommands::CHANGE_TASK_STATUS: {

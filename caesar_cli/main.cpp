@@ -17,14 +17,14 @@ int main() {
     typedef char* (*encrypt_func)(char*, int);
     typedef char* (*decrypt_func)(char*, int);
 
-    encrypt_func get_encrypted = (encrypt_func)dlsym(handle, "encrypt");
+    encrypt_func get_encrypted = (encrypt_func)dlsym(handle, "get_encrypted");
     if (!get_encrypted) {
         fprintf(stderr, "Error loading encrypt: %s\n", dlerror());
         dlclose(handle);
         return 1;
     }
 
-    decrypt_func get_decrypted = (decrypt_func)dlsym(handle, "decrypt");
+    decrypt_func get_decrypted = (decrypt_func)dlsym(handle, "get_decrypted");
     if (!get_decrypted) {
         fprintf(stderr, "Error loading decrypt: %s\n", dlerror());
         dlclose(handle);

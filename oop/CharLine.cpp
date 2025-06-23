@@ -29,3 +29,10 @@ CharLine::CharLine(std::ifstream &file) {
         delete[] temp;
     }
 }
+
+std::vector<CharArray *> CharLine::get_text_fields() {
+    std::vector<CharArray*> fields;
+    fields.push_back(char_arr_ptr);
+    return fields;
+}
+

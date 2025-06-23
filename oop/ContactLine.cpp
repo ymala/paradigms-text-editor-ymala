@@ -9,10 +9,18 @@
 ContactLine::ContactLine(char *in_name, char *in_email) {
     name->append_null_term_str(in_name);
     email->append_null_term_str(in_email);
-    repr_fill();
 }
 
 CharArray *ContactLine::str_repr_ptr() {
+    char c_buffer[] = "Contact: ";
+    char e_buffer[] = "  Email: ";
+
+    repr->clear();
+
+    repr->append_null_term_str(c_buffer);
+    repr->append_null_term_str(name->symbols_ptr);
+    repr->append_null_term_str(e_buffer);
+    repr->append_null_term_str(email->symbols_ptr);
     return repr;
 }
 
@@ -42,20 +50,12 @@ ContactLine::ContactLine(std::ifstream &file) {
     file.read(temp_email, email_len);
     email->append(temp_email, email_len);
     delete[] temp_email;
-
-    repr_fill();
-}
-
-void ContactLine::repr_fill() {
-    char c_buffer[] = "Contact: ";
-    char e_buffer[] = "  Email: ";
-
-
-    repr->append_null_term_str(c_buffer);
-    repr->append_null_term_str(name->symbols_ptr);
-    repr->append_null_term_str(e_buffer);
-    repr->append_null_term_str(email->symbols_ptr);
 }
 
 
-
+std::vector<CharArray*> ContactLine::get_text_fields() {
+    std::vector<CharArray*> fields;
+    fields.push_back(name);
+    fields.push_back(email);
+    return fields;
+}

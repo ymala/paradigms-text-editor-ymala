@@ -6,6 +6,7 @@
 #define TEXTEDITOR_H
 #include <stack>
 
+#include "CaesarCipher.h"
 #include "CharLine.h"
 #include "Commands.h"
 #include "utils.h"
@@ -47,6 +48,7 @@ private:
     LinePointerArray line_ptrs;
     std::stack<Command*> done_cmds_stack;
     std::stack<Command*> canceled_cmds_stack;
+    CaesarCipher *encryptor;
 };
 
 void end_program(TextEditor *editor);

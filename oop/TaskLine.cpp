@@ -53,5 +53,9 @@ void TaskLine::status_dispr_fill() {
     done_displ->append(done, strlen(done));
 }
 
-
+std::vector<CharArray*> TaskLine::get_text_fields() {
+    std::vector<CharArray*> fields;
+    fields.push_back(description);
+    return fields;
+}
 
